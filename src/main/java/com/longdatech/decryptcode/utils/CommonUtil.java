@@ -30,6 +30,9 @@ public class CommonUtil {
     //发送小程序模板消息url
     public static final String SEND_MINI_MESSAGE_REQUEST_URL = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=";
 
+    // 生成小程序二维码
+    public final static String QRCODE_URL = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=";
+
     /**
      * 发送 https 请求
      * 

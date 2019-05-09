@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Wxutils_Application {
+public class WxUtils_Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Wxutils_Application.class, args);
+        SpringApplication.run(WxUtils_Application.class, args);
     }
 
 }

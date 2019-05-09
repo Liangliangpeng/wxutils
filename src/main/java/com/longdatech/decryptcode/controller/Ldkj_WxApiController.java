@@ -39,9 +39,10 @@ public class Ldkj_WxApiController {
      * @param code
      * @return
      */
-    @ApiOperation("1.0：解密opendid")
+    @ApiOperation("1.0：解密code")
     @GetMapping("/decryptCode")
     public String decryptCode(@RequestParam String code){
+        log.info("1.0：解密code===>code:" + code);
         String result = MyHttpRequestUtil.sendGet(WxConstant.getDesryptCodeUri(code));
         JSONObject ojb = JSONObject.parseObject(result);
         System.out.println("返回结果:" + ojb);
@@ -61,6 +62,7 @@ public class Ldkj_WxApiController {
     @ApiOperation("1.1：发送小程序模板消息")
     @GetMapping("/sendMiniTemplateMessage")
     public String sendMiniTemplateMessage(@RequestParam String formId,@RequestParam String openId){
+        log.info("1.1：发送小程序模板消息===>formId:" + formId + ",openId:" + openId);
         ldkjWxApiService.sendMiniTemplate(formId,openId);
         return "success";
     }
@@ -74,6 +76,7 @@ public class Ldkj_WxApiController {
     @ApiOperation("1.2：微信公众号服务器配置校验token")
     @RequestMapping("/checkToken")
     public void checkToken(HttpServletRequest request,HttpServletResponse response){
+        log.info("1.2：微信公众号服务器配置校验token");
         //token验证代码段
         try{
             log.info("请求已到达，开始校验token");
@@ -96,7 +99,7 @@ public class Ldkj_WxApiController {
 
     /**
      * @description 该接口url应与服务器配置中填写的URL保持一致，因校验token与处理用户校验事件都只
-     * 能用一个URL，所以可以在token验证之后把1.2接口注释掉，把本节口名称改为1.2接口名称
+     * 能用一个URL，所以可以在token验证之后把1.2接口注释掉，把本接口名称改为1.2接口名称
      * @author: liyinlong
      * @date 2019-05-09 12:10
      * @param request
@@ -106,7 +109,7 @@ public class Ldkj_WxApiController {
     @ApiOperation("1.3：用户与公众号交互事件处理")
     @RequestMapping
     public String handlePubFocus(HttpServletRequest request,HttpServletResponse response){
-        log.info("========用户与公众号交互事件处理========= ");
+        log.info("1.3：用户与公众号交互事件处理");
         try{
             Map<String ,String > requestMap = WxMessageUtil.parseXml(request);
             Set<String> keys = requestMap.keySet();
@@ -137,15 +140,32 @@ public class Ldkj_WxApiController {
     }
 
     /**
-     * @description 小程序发送模板消息
+     * @description 公众号发送模板消息
      * @author: liyinlong
      * @date 2019-05-05 13:58
      * @return
      */
-    @ApiOperation("1.4：发送小程序模板消息")
+    @ApiOperation("1.4：发送公众号模板消息")
     @GetMapping("/sendPubTemplateMessage")
-    public String sendPubTemplateMessage(@RequestParam String formId,@RequestParam String openId){
-        ldkjWxApiService.sendMiniTemplate(formId,openId);
+    public String sendPubTemplateMessage(@RequestParam String openId){
+        log.info("1.4：发送公众号模板消息===>openId:" + openId);
+        ldkjWxApiService.sendPubTemplateMessage(openId);
         return "success";
     }
+
+    /**
+     * @description 生成小程序二维码 官方文档：https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/qr-code.html
+     * @author: liyinlong
+     * @date 2019-05-09 15:00
+     * @param strinfo
+     * @return
+     */
+    @ApiOperation("1.5：生成小程序二维码")
+    @GetMapping("/createQrCode")
+    public String createQrCode(String strinfo){
+        ldkjWxApiService.createQrCode(strinfo);
+        return "success";
+    }
+
+
 }
