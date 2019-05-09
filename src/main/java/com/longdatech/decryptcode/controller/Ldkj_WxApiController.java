@@ -1,13 +1,16 @@
 package com.longdatech.decryptcode.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.longdatech.decryptcode.service.LdkjWxApiService;
 import com.longdatech.decryptcode.utils.MyHttpRequestUtil;
 import com.longdatech.decryptcode.utils.SignUtil;
 import com.longdatech.decryptcode.utils.WxConstant;
+import com.longdatech.decryptcode.utils.WxMessageUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -25,6 +29,9 @@ import java.util.Set;
 @RequestMapping("/wxapi")
 public class Ldkj_WxApiController {
 
+    @Autowired
+    private LdkjWxApiService ldkjWxApiService;
+
     /**
      * @description 解密code得到openid
      * @author: liyinlong
@@ -32,7 +39,7 @@ public class Ldkj_WxApiController {
      * @param code
      * @return
      */
-    @ApiOperation("解密opendid")
+    @ApiOperation("1.0：解密opendid")
     @GetMapping("/decryptCode")
     public String decryptCode(@RequestParam String code){
         String result = MyHttpRequestUtil.sendGet(WxConstant.getDesryptCodeUri(code));
@@ -51,12 +58,11 @@ public class Ldkj_WxApiController {
      * @date 2019-05-05 13:58
      * @return
      */
-    @ApiOperation("发送模板消息")
-    @GetMapping("/sendTemplateMessage")
-    public String sendTemplateMessage(@RequestParam String formId,@RequestParam String openId){
-
-
-        return "";
+    @ApiOperation("1.1：发送小程序模板消息")
+    @GetMapping("/sendMiniTemplateMessage")
+    public String sendMiniTemplateMessage(@RequestParam String formId,@RequestParam String openId){
+        ldkjWxApiService.sendMiniTemplate(formId,openId);
+        return "success";
     }
 
     /**
@@ -65,7 +71,7 @@ public class Ldkj_WxApiController {
      * @date 2019-05-09 9:38
      * @return
      */
-    @ApiOperation("微信公众号服务器配置校验token")
+    @ApiOperation("1.2：微信公众号服务器配置校验token")
     @RequestMapping("/checkToken")
     public void checkToken(HttpServletRequest request,HttpServletResponse response){
         //token验证代码段
@@ -88,4 +94,58 @@ public class Ldkj_WxApiController {
         }
     }
 
+    /**
+     * @description 该接口url应与服务器配置中填写的URL保持一致，因校验token与处理用户校验事件都只
+     * 能用一个URL，所以可以在token验证之后把1.2接口注释掉，把本节口名称改为1.2接口名称
+     * @author: liyinlong
+     * @date 2019-05-09 12:10
+     * @param request
+     * @param response
+     * @return
+     */
+    @ApiOperation("1.3：用户与公众号交互事件处理")
+    @RequestMapping
+    public String handlePubFocus(HttpServletRequest request,HttpServletResponse response){
+        log.info("========用户与公众号交互事件处理========= ");
+        try{
+            Map<String ,String > requestMap = WxMessageUtil.parseXml(request);
+            Set<String> keys = requestMap.keySet();
+            keys.forEach(item->{
+                String value = requestMap.get(item);
+                log.info(item + "===>" + value);
+            });
+            String messageType = requestMap.get("MsgType");
+            String eventType = requestMap.get("Event");
+            String openid = requestMap.get("FromUserName");
+            if(messageType.equals("event")){
+                //判断消息类型是否是事件消息类型
+                log.info("公众号====>事件消息");
+                log.info("openid:" + openid);
+                log.info("Event:" + eventType);
+                if(eventType.equals("subscribe")){
+                    log.info("公众号====>新用户关注");
+                }else if(eventType.equals("unsubscribe")){
+                    log.info("公众号====>用户取消关注");
+                }else{
+                    log.info("公众号===>其他");
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * @description 小程序发送模板消息
+     * @author: liyinlong
+     * @date 2019-05-05 13:58
+     * @return
+     */
+    @ApiOperation("1.4：发送小程序模板消息")
+    @GetMapping("/sendPubTemplateMessage")
+    public String sendPubTemplateMessage(@RequestParam String formId,@RequestParam String openId){
+        ldkjWxApiService.sendMiniTemplate(formId,openId);
+        return "success";
+    }
 }
