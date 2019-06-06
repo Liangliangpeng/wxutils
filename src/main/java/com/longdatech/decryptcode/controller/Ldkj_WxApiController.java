@@ -1,20 +1,23 @@
 package com.longdatech.decryptcode.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.longdatech.decryptcode.form.LdkjPayForm;
 import com.longdatech.decryptcode.service.LdkjWxApiService;
-import com.longdatech.decryptcode.utils.*;
+import com.longdatech.decryptcode.utils.MyHttpRequestUtil;
+import com.longdatech.decryptcode.utils.SignUtil;
+import com.longdatech.decryptcode.utils.WxConstant;
+import com.longdatech.decryptcode.utils.WxMessageUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -164,17 +167,7 @@ public class Ldkj_WxApiController {
         return "success";
     }
 
-    /**
-     * @description 微信支付
-     * @author: liyinlong
-     * @date 2019-05-22 10:54
-     * @return
-     */
-    @ApiOperation("1.6：微信支付")
-    @PostMapping("/requestPay")
-    public ServerResponse requestPay(@Valid @RequestBody LdkjPayForm payForm, BindingResult bindingResult){
-        return ldkjWxApiService.requestPay(payForm);
-    }
+
 
 
 }
