@@ -36,10 +36,10 @@ public class Ldkj_WxApiController {
      * @param code
      * @return
      */
-    @ApiOperation("1.0：解密code")
+    @ApiOperation("1.0：微信小程序解密code")
     @GetMapping("/decryptCode")
     public String decryptCode(@RequestParam String code){
-        log.info("1.0：解密code===>code:" + code);
+        log.info("1.0：微信小程序解密code===>code:" + code);
         String result = MyHttpRequestUtil.sendGet(WxConstant.getDesryptCodeUri(code));
         JSONObject ojb = JSONObject.parseObject(result);
         System.out.println("返回结果:" + ojb);
