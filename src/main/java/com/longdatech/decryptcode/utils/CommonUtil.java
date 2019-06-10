@@ -33,6 +33,13 @@ public class CommonUtil {
     // 生成小程序二维码
     public final static String QRCODE_URL = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=";
 
+    //生成含参数的公众号二维码
+    public final static String CONTAIN_PARAMS_QRCODE = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=";
+
+    //生成的公众号二维码图片前缀
+    public final static String MP_QRCODE_PRE_URL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=";
+
+
     /**
      * 发送 https 请求
      * 

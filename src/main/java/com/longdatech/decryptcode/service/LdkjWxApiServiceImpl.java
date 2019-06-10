@@ -1,5 +1,7 @@
 package com.longdatech.decryptcode.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.longdatech.decryptcode.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -12,6 +14,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Transactional
 @Service
-public class LdkjWxApiServiceImpl implements LdkjWxApiService{
+public class LdkjWxApiServiceImpl implements LdkjWxApiService {
 
     @Override
     public void sendMiniTemplate(String formid, String openid) {
@@ -38,7 +41,7 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService{
 
         TemplateData td0 = new TemplateData("内容1");
         TemplateData td1 = new TemplateData("内容2");
-        TemplateData td2 = new TemplateData("内容3" );
+        TemplateData td2 = new TemplateData("内容3");
 
         list.add(td0);
         list.add(td1);
@@ -59,10 +62,10 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService{
         wxMssVo.setRequest_url("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + pubtoken.getAccessToken());
         List<TemplateData> list = new ArrayList<>();
 
-        TemplateData td0 = new TemplateData("first","xxx");
-        TemplateData td1 = new TemplateData("keyword1","xxx");
-        TemplateData td2 = new TemplateData("keyword2","xxx");
-        TemplateData td3 = new TemplateData("remark","xxx");
+        TemplateData td0 = new TemplateData("first", "xxx");
+        TemplateData td1 = new TemplateData("keyword1", "xxx");
+        TemplateData td2 = new TemplateData("keyword2", "xxx");
+        TemplateData td3 = new TemplateData("remark", "xxx");
 
         list.add(td0);
         list.add(td1);
@@ -117,9 +120,9 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService{
                 outputStream.write(buf, 0, len);
             }
             outputStream.flush();
-            log.info("upload url:"+file.getAbsolutePath());
+            log.info("upload url:" + file.getAbsolutePath());
             String path = file.getAbsolutePath();
-            log.info("file: "+ path.substring(0,path.lastIndexOf(File.separator)));
+            log.info("file: " + path.substring(0, path.lastIndexOf(File.separator)));
         } catch (Exception e) {
             log.error("调用小程序生成微信永久小程序码URL接口异常", e);
         } finally {
@@ -140,4 +143,29 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService{
         }
     }
 
+    @Override
+    public String getPubQrCode() {
+        Token pubtoken = CommonUtil.getToken(WxConstant.FUWUHAO__APPID, WxConstant.FUWUHAO__SECRET);
+        JSONObject params = new JSONObject();
+        params.put("action_name", "QR_SCENE");
+        params.put("expire_seconds", 30000);
+
+        JSONObject action_info = new JSONObject();
+        JSONObject action_info_result = new JSONObject();
+        action_info_result.put("scene_str", 123);
+
+        action_info.put("scene", action_info_result);
+        params.put("action_info", action_info);
+
+        try {
+            JSONObject res = JSON.parseObject(MyHttpRequestUtil.sendPost(CommonUtil.CONTAIN_PARAMS_QRCODE + pubtoken.getAccessToken(), params.toString()));
+            String ticket = URLEncoder.encode(res.getString("ticket"),"UTF-8");
+            String picUrl = CommonUtil.MP_QRCODE_PRE_URL + ticket;
+            log.info("picUrl:"+picUrl);
+            return picUrl;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "error";
+    }
 }

@@ -2,10 +2,7 @@ package com.longdatech.decryptcode.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.longdatech.decryptcode.service.LdkjWxApiService;
-import com.longdatech.decryptcode.utils.MyHttpRequestUtil;
-import com.longdatech.decryptcode.utils.SignUtil;
-import com.longdatech.decryptcode.utils.WxConstant;
-import com.longdatech.decryptcode.utils.WxMessageUtil;
+import com.longdatech.decryptcode.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -163,11 +160,24 @@ public class Ldkj_WxApiController {
     @ApiOperation("1.5：生成小程序二维码")
     @GetMapping("/createQrCode")
     public String createQrCode(String strinfo){
+        log.info("1.5：生成小程序二维码===>strinfo:"+strinfo);
         ldkjWxApiService.createQrCode(strinfo);
         return "success";
     }
 
 
-
+    /**
+     * 官方文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
+     * @description 生成公众号带参数二维码
+     * @author: liyinlong
+     * @date 2019-06-10 16:14
+     * @return
+     */
+    @ApiOperation("1.6：生成公众号带参二维码")
+    @GetMapping("/getPubQrCode")
+    public String getPubQrCode(){
+        log.info("1.6：生成公众号带参二维码");
+        return ldkjWxApiService.getPubQrCode();
+    }
 
 }
