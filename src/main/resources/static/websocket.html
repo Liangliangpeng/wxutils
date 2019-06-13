@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>websocket</title>
+ <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="sse">
+ <p>message:<input id="info"/><button onclick="sendMessage()">发送</button></p>
+ <textarea name="messagebox" id="messagebox" cols="30" rows="10">
+ </textarea>
+</div>
+</body>
+<script type="text/javascript">
+     var ipaddr = "localhost:8091";
+     var userId = 1234;
+     var messageValue = "";
+     // 打开一个 web socket
+     var ws = new WebSocket("ws://" + ipaddr + "/websocket/" + userId);
+
+     function WebSocketTest() {
+       if ("WebSocket" in window){
+         // alert("您的浏览器支持 WebSocket!");
+         ws.onmessage = function (evt){
+         var received_msg = $.parseJSON(evt.data);
+         console.log(received_msg);
+         console.log("code:" + received_msg.code);
+         console.log("message:" + received_msg.message);
+         messageValue = messageValue + "\n" +received_msg.message;
+          $("#messagebox").val(messageValue);
+         // alert("数据已接收...");
+         };
+         ws.onclose = function(){
+         // 关闭 websocket
+         alert("连接已关闭...");
+         };
+       }
+       else{
+         // 浏览器不支持 WebSocket
+         alert("您的浏览器不支持 WebSocket!");
+       }
+     }
+     WebSocketTest();
+     function sendMessage(){
+        // Web Socket 已连接上，使用 send() 方法发送数据
+        ws.send($("#info").val());
+        console.log("数据发送中..." + $("#info").val());
+     }
+</script>
+</html>
