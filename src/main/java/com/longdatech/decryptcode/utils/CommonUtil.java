@@ -21,7 +21,7 @@ import java.net.URL;
 @Slf4j
 public class CommonUtil {
     
-    // 小程序获取token凭证获取（GET）url
+    // 获取token凭证获取（GET）url
     public final static String token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
 
     //公众号获取根据openid获取unionid url

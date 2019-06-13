@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>首页</title>
+ <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+ <!-- import CSS -->
+ <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+ <style>
+  .body{
+   background-image: url("systemindex.png");
+   background-repeat: no-repeat;
+   background-size: cover;
+  }
+ </style>
+</head>
+<body class="body" id="app">
+
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script src="https://cdn.bootcss.com/vue-resource/1.5.1/vue-resource.js"></script>
+
+<script>
+ new Vue({
+  el: '#app',
+  data: function () {
+   return {
+    accountLogin: false,
+   }
+  },
+  mounted: function () {
+   console.log("页面加载完成!");
+  },
+
+ })
+</script>
+</html>

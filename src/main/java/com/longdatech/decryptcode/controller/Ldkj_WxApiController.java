@@ -75,23 +75,28 @@ public class Ldkj_WxApiController {
     public void checkToken(HttpServletRequest request,HttpServletResponse response){
         log.info("1.2：微信公众号服务器配置校验token");
         //token验证代码段
-        try{
-            log.info("请求已到达，开始校验token");
-            if (StringUtils.isNotBlank(request.getParameter("signature"))) {
-                String signature = request.getParameter("signature");
-                String timestamp = request.getParameter("timestamp");
-                String nonce = request.getParameter("nonce");
-                String echostr = request.getParameter("echostr");
-                log.info("signature[{}], timestamp[{}], nonce[{}], echostr[{}]", signature, timestamp, nonce, echostr);
-                if (SignUtil.checkSignature(signature, timestamp, nonce)) {
-                    log.info("数据源为微信后台，将echostr[{}]返回！", echostr);
-                    response.getOutputStream().println(echostr);
+
+        String tempSignature = request.getParameter("signature");
+        if(null != tempSignature){
+            try{
+                log.info("请求已到达，开始校验token");
+                if (StringUtils.isNotBlank(request.getParameter("signature"))) {
+                    String signature = request.getParameter("signature");
+                    String timestamp = request.getParameter("timestamp");
+                    String nonce = request.getParameter("nonce");
+                    String echostr = request.getParameter("echostr");
+                    log.info("signature[{}], timestamp[{}], nonce[{}], echostr[{}]", signature, timestamp, nonce, echostr);
+                    if (SignUtil.checkSignature(signature, timestamp, nonce)) {
+                        log.info("数据源为微信后台，将echostr[{}]返回！", echostr);
+                        response.getOutputStream().println(echostr);
+                    }
                 }
+            }catch (IOException e){
+                log.error("校验出错");
+                e.printStackTrace();
             }
-        }catch (IOException e){
-            log.error("校验出错");
-            e.printStackTrace();
         }
+
     }
 
     /**
@@ -104,16 +109,12 @@ public class Ldkj_WxApiController {
      * @return
      */
     @ApiOperation("1.3：用户与公众号交互事件处理")
-    @RequestMapping("/handlePubFocus")
+    @RequestMapping("/getUserFocus")
     public String handlePubFocus(HttpServletRequest request,HttpServletResponse response){
         log.info("1.3：用户与公众号交互事件处理");
         try{
             Map<String ,String > requestMap = WxMessageUtil.parseXml(request);
             Set<String> keys = requestMap.keySet();
-            keys.forEach(item->{
-                String value = requestMap.get(item);
-                log.info(item + "===>" + value);
-            });
             String messageType = requestMap.get("MsgType");
             String eventType = requestMap.get("Event");
             String openid = requestMap.get("FromUserName");
@@ -126,10 +127,25 @@ public class Ldkj_WxApiController {
                     log.info("公众号====>新用户关注");
                 }else if(eventType.equals("unsubscribe")){
                     log.info("公众号====>用户取消关注");
+                }else if(eventType.equals("SCAN")){
+                    log.info("公众号===>用户扫码动态二维码");
                 }else{
                     log.info("公众号===>其他");
                 }
             }
+
+            keys.forEach(item->{
+                String value = requestMap.get(item);
+                log.info(item + "===>" + value);
+                if(item.equals("Ticket")){
+                    //当前用户进行了扫描动态二维码登录pc管理端操作
+                    log.info("==>开始处理扫码登录");
+                    log.info("当前用户openid:" + openid);
+                    log.info("当前用户Ticket:" + value);
+                    ldkjWxApiService.handleScanQrcode(openid,value);
+                }
+            });
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -168,6 +184,7 @@ public class Ldkj_WxApiController {
 
     /**
      * 官方文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1443433542
+     * 注意！！！此接口仅认证的服务号才能使用！！！
      * @description 生成公众号带参数二维码
      * @author: liyinlong
      * @date 2019-06-10 16:14
@@ -175,7 +192,7 @@ public class Ldkj_WxApiController {
      */
     @ApiOperation("1.6：生成公众号带参二维码")
     @GetMapping("/getPubQrCode")
-    public String getPubQrCode(){
+    public ServerResponse getPubQrCode(){
         log.info("1.6：生成公众号带参二维码");
         return ldkjWxApiService.getPubQrCode();
     }

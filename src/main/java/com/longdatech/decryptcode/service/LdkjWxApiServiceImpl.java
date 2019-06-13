@@ -3,6 +3,7 @@ package com.longdatech.decryptcode.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.longdatech.decryptcode.utils.*;
+import com.longdatech.decryptcode.websocketutils.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -144,7 +145,8 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService {
     }
 
     @Override
-    public String getPubQrCode() {
+    public ServerResponse getPubQrCode() {
+        //此处getToken方法内的参数需换成自己的服务号appid和secret
         Token pubtoken = CommonUtil.getToken(WxConstant.FUWUHAO__APPID, WxConstant.FUWUHAO__SECRET);
         JSONObject params = new JSONObject();
         params.put("action_name", "QR_SCENE");
@@ -152,20 +154,35 @@ public class LdkjWxApiServiceImpl implements LdkjWxApiService {
 
         JSONObject action_info = new JSONObject();
         JSONObject action_info_result = new JSONObject();
-        action_info_result.put("scene_str", 123);
+        action_info_result.put("scene_id", 8);
 
         action_info.put("scene", action_info_result);
         params.put("action_info", action_info);
 
+        Map<String,Object> result = new HashMap<>();
         try {
             JSONObject res = JSON.parseObject(MyHttpRequestUtil.sendPost(CommonUtil.CONTAIN_PARAMS_QRCODE + pubtoken.getAccessToken(), params.toString()));
             String ticket = URLEncoder.encode(res.getString("ticket"),"UTF-8");
             String picUrl = CommonUtil.MP_QRCODE_PRE_URL + ticket;
-            log.info("picUrl:"+picUrl);
-            return picUrl;
+            log.info("二维码地址:picUrl:"+picUrl);
+            result.put("qrCodeUrl",picUrl);
+            result.put("ticket",ticket);
+            return ServerResponse.createBySuccess(result);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "error";
+        return ServerResponse.createByError();
+    }
+
+    //处理微信扫码登录
+    @Override
+    public void handleScanQrcode(String pubOpenid, String ticket) {
+        try {
+            log.info("处理微信扫码登录:" );
+            WebSocketServer.sendInfo(200,"访问成功",ticket);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
     }
 }

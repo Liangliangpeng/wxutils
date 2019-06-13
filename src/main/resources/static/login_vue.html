@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:v-if="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .body{
+            background-image: url("backpic.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .qrcodeimg {
+            width: 200px;
+            height: 200px;
+        }
+        .maindiv {
+            width: 400px;
+            height: 400px;
+            margin-top: 200px;
+            float: right;
+        }
+        .infoinput {
+            width: 200px;
+            display: block;
+        }
+        .infoBox {
+            width: 220px;
+            height: 220px;
+            max-height: 220px;
+        }
+    </style>
+</head>
+<body class="body">
+<div id="app" class="maindiv">
+
+    <div v-if="accountLogin" class="infoBox">
+        <el-input label="手机号" placeholder="请输入手机号" class="infoinput"></el-input>
+        <p>&nbsp;</p>
+        <el-input label="密码" placeholder="请输入密码" class="infoinput"></el-input>
+    </div>
+
+    <div v-if="qrcodeLogin" class="infoBox">
+        <div class="block" v-if="qrcodeLogin">
+            <el-image :src="src" class="qrcodeimg">
+                <div slot="placeholder" class="image-slot">
+                    加载中<span class="dot">...</span>
+                </div>
+            </el-image>
+        </div>
+    </div>
+    <el-button @click="accountLogin = true,qrcodeLogin = false">使用手机</el-button>
+    <el-button @click="qrcodeLogin = true,accountLogin = false">使用微信</el-button>
+
+
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script src="https://cdn.bootcss.com/vue-resource/1.5.1/vue-resource.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                accountLogin: false,
+                qrcodeLogin: true,
+                src: 'http://pho.fangcuntech.cn/1560309343439',
+                ipaddr: "localhost:8091",
+                enableSSL: ""
+            }
+        },
+        mounted: function () {
+            console.log("页面加载完成!");
+            this.getQrcode();
+        },
+        methods: {
+            getQrcode(){//获取带参二维码，并设置到页面
+                console.log("设置二维码");
+                //请求二维码
+                const that = this;
+                this.$http.get("http" + that.enableSSL + "://" + that.ipaddr + "/wxapi/getPubQrCode").then(function(data){
+                    console.log("function1:返回结果");
+                    console.log(data.body.data);
+                    //二维码图片地址
+                    that.src = data.body.data.qrCodeUrl;
+                    //ticket
+                    that.websocketLink(data.body.data.ticket);
+                },function(res){
+                    console.log("function2");
+                    console.log(res);
+                });
+            },
+            websocketLink(userId) {
+                var that = this;
+                if ("WebSocket" in window) {
+                    console.log("您的浏览器支持 WebSocket!");
+                    // 打开一个 web socket
+                    var ws = new WebSocket("ws" + that.enableSSL + "://" + that.ipaddr + "/websocket/" + userId);
+                    ws.onopen = function () {
+                        // Web Socket 已连接上，使用 send() 方法发送数据
+                        ws.send("pc端请求扫码登录:userId:" + userId);
+                        // console.log("数据发送中...");
+                    };
+                    ws.onmessage = function (evt) {
+                        console.log(evt.data);
+                        var received_msg = JSON.parse(evt.data);
+                        console.log("code:" + received_msg.code);
+                        console.log("message:" + received_msg.message);
+                        if (received_msg.code == 200) {
+                            console.log("登录成功，进行页面跳转...");
+                            window.location = "success.html";
+                        } else if (received_msg.code == -1) {
+                            console.log("登录失败！");
+                        } else {
+                            console.log("socket通道校验");
+                        }
+                        // console.log("数据已接收...");
+                    };
+                    ws.onclose = function () {
+                        // 关闭 websocket
+                        console.log("连接已关闭...");
+                    };
+                } else {
+                    // 浏览器不支持 WebSocket
+                    console("您的浏览器不支持 WebSocket!");
+                }
+            }
+        }
+    })
+</script>
+</html>

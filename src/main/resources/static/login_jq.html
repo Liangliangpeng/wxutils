@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+ <meta charset="utf-8">
+ <title>微信扫码登录</title>
+ <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+<body>
+
+<div id="sse">
+
+ <img src="bgpic.jpg" alt="" id="qrcode" style="width: 200px;height: 200px;">
+
+</div>
+
+</body>
+<script type="text/javascript">
+
+     var ipaddr = "localhost:8091";
+
+     function WebSocketTest(userId) {
+       if ("WebSocket" in window){
+         // alert("您的浏览器支持 WebSocket!");
+
+         // 打开一个 web socket
+         var ws = new WebSocket("ws://" + ipaddr + "/websocket/" + userId);
+
+         ws.onopen = function(){
+         // Web Socket 已连接上，使用 send() 方法发送数据
+         ws.send("发送数据");
+         // alert("数据发送中...");
+         };
+
+         ws.onmessage = function (evt){
+         var received_msg = $.parseJSON(evt.data);
+         console.log(received_msg);
+         console.log("code:" + received_msg.code);
+
+         if(received_msg.code == 200){
+          console.log("登录成功，进行页面跳转...");
+          window.location = "success.html";
+         }else{
+          console.log("登录失败！");
+         }
+         // alert("数据已接收...");
+         };
+
+         ws.onclose = function(){
+         // 关闭 websocket
+         alert("连接已关闭...");
+         };
+       }
+       else{
+         // 浏览器不支持 WebSocket
+         alert("您的浏览器不支持 WebSocket!");
+       }
+     }
+
+     function setPic() {
+        console.log("设置二维码");
+        //请求二维码
+        $.get("http://" + ipaddr + "/wxapi/getPubQrCode", function(result){
+        console.log("请求二维码结果");
+        console.log(result);
+        var ticket = result.data.ticket;
+        var qrCodeUrl = result.data.qrCodeUrl;
+        $("#qrcode").attr("src",qrCodeUrl);
+        WebSocketTest(ticket);
+        });
+     }
+
+     setPic();
+</script>
+</html>
