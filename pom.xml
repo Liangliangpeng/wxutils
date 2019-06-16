@@ -135,7 +135,12 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-
+        <!--腾讯云短信接口-->
+        <dependency>
+            <groupId>com.github.qcloudsms</groupId>
+            <artifactId>qcloudsms</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 
 
 

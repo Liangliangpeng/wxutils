@@ -17,7 +17,7 @@ import java.io.IOException;
 @Api(description = "Websocket控制器")
 @RestController
 @RequestMapping("/messagecenter")
-public class WebsocketController {
+public class Ldkj_WebsocketController {
 
 	//页面请求
 	@GetMapping("/socket/{cid}")
