@@ -143,7 +143,12 @@
         </dependency>
 
 
-
+        <!-- 发送邮件依赖 -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.6</version>
+        </dependency>
 
 
 
