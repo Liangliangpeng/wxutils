@@ -21,7 +21,7 @@ import java.util.Set;
 
 
 @Slf4j
-@Api(description = "微信接口相关控制器")
+@Api(description = "1.微信接口相关控制器")
 @RestController
 @RequestMapping("/wxapi")
 public class Ldkj_WxApiController {

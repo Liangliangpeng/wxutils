@@ -47,7 +47,7 @@ public class MailUtil {
 
         // 连接邮件服务器：邮箱类型，帐号，授权码代替密码（更安全）
         // 后面的字符是授权码，不能用qq密码
-        ts.connect("smtp.qq.com", "469757429@qq.com", "");
+        ts.connect("smtp.qq.com", "469757429@qq.com", "此处填写授权码");
 
         //声明一个Message对象(代表一封邮件),从session中创建
         MimeMessage msg = new MimeMessage(session);

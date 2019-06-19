@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @Slf4j
-@Api(description = "邮件控制器")
+@Api(description = "4.邮件控制器")
 @RestController
 @RequestMapping("/email")
 public class Ldkj_EmailController {

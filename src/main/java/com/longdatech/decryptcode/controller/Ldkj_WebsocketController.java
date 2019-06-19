@@ -14,7 +14,7 @@ import java.io.IOException;
  * @date 2019-06-11 10:44
  */
 
-@Api(description = "Websocket控制器")
+@Api(description = "2.Websocket控制器")
 @RestController
 @RequestMapping("/messagecenter")
 public class Ldkj_WebsocketController {

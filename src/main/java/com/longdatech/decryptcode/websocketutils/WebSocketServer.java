@@ -14,6 +14,7 @@ import lombok.Data;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
+
 @Slf4j
 @ServerEndpoint("/websocket/{sid}")
 @Component
@@ -72,11 +73,6 @@ public class WebSocketServer {
         }
     }
 
-	/**
-	 * 
-	 * @param session
-	 * @param error
-	 */
     @OnError
     public void onError(Session session, Throwable error) {
         log.error("发生错误");
@@ -91,7 +87,6 @@ public class WebSocketServer {
         messageResult.put("message",message);
         this.session.getBasicRemote().sendText(messageResult.toString());
     }
-
 
     /**
      * 群发自定义消息
